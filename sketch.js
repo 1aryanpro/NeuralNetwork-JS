@@ -1,1 +1,1 @@
-console.log('tada')
+let m = new Matrix(5, 5)
