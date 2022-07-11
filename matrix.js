@@ -46,12 +46,22 @@ class Matrix {
 
   static mult(a, b) {
     if (a[0].length != b.length) return null;
-    let res = new matrix(b[0].length, a.length);
+    let res = matrix(b[0].length, a.length);
     for (let row = 0; row < res.length; row++) {
       for (let col = 0; col < res[0].length; col++) {
         for (let i = 0; i < a[0].length; i++) {
           res[row][col] += a[row][i] * b[i][col];
         }
+      }
+    }
+    return res;
+  }
+
+  static T(a) {
+    let res = matrix(a.length, a[0].length);
+    for (let row = 0; row < res.length; row++) {
+      for (let col = 0; col < res[0].length; col++) {
+        res[row][col] = a[col][row];
       }
     }
     return res;
