@@ -1,12 +1,19 @@
 class NN {
-  constructor(inputs, hiddens, outputs) {
-    const random = () => Math.random() * 2 - 1;
+  constructor(layers) {
+    const random = () => Math.random();
 
-    this.weights_ih = matrix(hiddens, inputs, random);
-    this.weights_ho = matrix(outputs, hiddens, random);
+    this.weights = [];
+    this.biases = [];
 
-    this.biases_ih = matrix(hiddens, 1, random);
-    this.biases_ho = matrix(outputs, 1, random);
+    for (let i = 1; i < layers.length; i++) {
+      let l = layers[i];
+      let p = layers[i - 1];
+
+      this.weights.push(matrix(l, p, random));
+      this.biases.push(matrix(l, 1, random));
+    }
+
+    this.layers = layers.length - 1;
 
     this.ALPHA = 0.01;
   }
@@ -20,10 +27,11 @@ class NN {
   }
 
   feedForward(inputs) {
-    inputs = Matrix.T([inputs]);
+    let outputs = Matrix.T([inputs]);
 
-    let hiddens = this.layerOutput(inputs, this.weights_ih, this.biases_ih);
-    let outputs = this.layerOutput(hiddens, this.weights_ho, this.biases_ho);
+    for (let i = 0; i < this.layers; i++) {
+      outputs = this.layerOutput(outputs, this.weights[i], this.biases[i]);
+    }
 
     return outputs;
   }
@@ -44,27 +52,30 @@ class NN {
     inputs = Matrix.T([inputs]);
     targets = Matrix.T([targets]);
 
-    let hiddens = this.layerOutput(inputs, this.weights_ih, this.biases_ih);
-    let outputs = this.layerOutput(hiddens, this.weights_ho, this.biases_ho);
+    let outputs = [inputs];
 
-    let output_errors = Matrix.sub(targets, outputs);
-    let [weights_ho_deltas, biases_ho_deltas] = this.layerDeltas(
-      hiddens,
-      outputs,
-      output_errors
-    );
-    this.weights_ho = Matrix.add(this.weights_ho, weights_ho_deltas);
-    this.biases_ho = Matrix.add(this.biases_ho, biases_ho_deltas);
+    for (let i = 0; i < this.layers; i++) {
+      outputs.push(
+        this.layerOutput(
+          outputs[outputs.length - 1],
+          this.weights[i],
+          this.biases[i]
+        )
+      );
+    }
+    let errors = Matrix.sub(targets, outputs[this.layers]);
 
-    let weights_ho_T = Matrix.T(this.weights_ho);
-    let hidden_errors = Matrix.dot(weights_ho_T, output_errors);
-    let [weights_ih_deltas, biases_ih_deltas] = this.layerDeltas(
-      inputs,
-      hiddens,
-      hidden_errors
-    );
-    this.weights_ih = Matrix.add(this.weights_ih, weights_ih_deltas);
-    this.biases_ih = Matrix.add(this.biases_ih, biases_ih_deltas);
+    for (let i = this.layers - 1; i >= 0; i--) {
+      let [weight_deltas, bias_deltas] = this.layerDeltas(
+        outputs[i],
+        outputs[i + 1],
+        errors
+      );
+      this.weights[i] = Matrix.add(this.weights[i], weight_deltas);
+      this.biases[i] = Matrix.add(this.biases[i], bias_deltas);
+
+      let wT = Matrix.T(this.weights[i]);
+      errors = Matrix.dot(wT, errors);
+    }
   }
 }
-
