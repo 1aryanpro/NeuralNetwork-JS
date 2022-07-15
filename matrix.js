@@ -14,10 +14,10 @@ class Matrix {
   }
 
   static map(a, f) {
-    let result = matrix(a[0].length, a.length);
+    let result = matrix(a.length, a[0].length);
     for (let i = 0; i < a.length; i++) {
       for (let j = 0; j < a[0].length; j++) {
-        result[i][j] = f(a[i][j]);
+        result[i][j] = f(a[i][j], i, j);
       }
     }
 
@@ -26,10 +26,10 @@ class Matrix {
 
   static map2(a, b, f) {
     if (a[0].length != b[0].length || a.length != b.length) return null;
-    let result = matrix(a[0].length, a.length);
+    let result = matrix(a.length, a[0].length);
     for (let i = 0; i < a.length; i++) {
       for (let j = 0; j < a[0].length; j++) {
-        result[i][j] = f(a[i][j], b[i][j]);
+        result[i][j] = f(a[i][j], b[i][j], i, j);
       }
     }
 
@@ -44,9 +44,9 @@ class Matrix {
     return Matrix.map2(a, b, (x, y) => x - y);
   }
 
-  static mult(a, b) {
+  static dot(a, b) {
     if (a[0].length != b.length) return null;
-    let res = matrix(b[0].length, a.length);
+    let res = matrix(a.length, b[0].length);
     for (let row = 0; row < res.length; row++) {
       for (let col = 0; col < res[0].length; col++) {
         for (let i = 0; i < a[0].length; i++) {
@@ -58,7 +58,7 @@ class Matrix {
   }
 
   static T(a) {
-    let res = matrix(a.length, a[0].length);
+    let res = matrix(a[0].length, a.length);
     for (let row = 0; row < res.length; row++) {
       for (let col = 0; col < res[0].length; col++) {
         res[row][col] = a[col][row];
@@ -72,7 +72,7 @@ class Matrix {
   }
 }
 
-function matrix(w, h, f = () => 0) {
+function matrix(h, w, f = () => 0) {
   let data = [];
   for (let i = 0; i < h; i++) {
     data[i] = [];
