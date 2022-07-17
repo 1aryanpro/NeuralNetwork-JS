@@ -23,7 +23,7 @@ function draw() {
   const func = (x, y) => (x * x + y * y < 1 ? 1 : 0);
   // const func = (x, y) => Math.abs(x - y) < 0.1 ? 1 : 0;
 
-  for (let i = 0; i < 500; i++) {
+  for (let i = 0; i < 1000; i++) {
     let x = random();
     let y = random();
 

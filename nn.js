@@ -19,7 +19,8 @@ class NN {
   }
 
   layerOutput(inputs, weights, biases) {
-    const transfer = (x) => 1 / (1 + Math.exp(-x));
+    const transfer = (x) => Math.max(x, 0);
+
     let outputs = Matrix.dot(weights, inputs);
     outputs = Matrix.add(outputs, biases);
     outputs = Matrix.map(outputs, transfer);
@@ -37,7 +38,7 @@ class NN {
   }
 
   layerDeltas(inputs, outputs, errors) {
-    const transfer_deriv = (v) => v * (1 - v);
+    const transfer_deriv = (v) => v;
 
     let gradient = Matrix.map(outputs, transfer_deriv);
     gradient = Matrix.map2(gradient, errors, (a, b) => a * b);
